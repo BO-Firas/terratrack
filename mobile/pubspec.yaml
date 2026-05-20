@@ -1,0 +1,51 @@
+name: pfe_gps_mobile
+description: Application mobile agent terrain - PFE GPS Tracking
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+
+  # ============ Reseau ============
+  http: ^1.2.2                       # Requetes REST
+  dio: ^5.7.0                        # Client HTTP plus avance (intercepteurs)
+  socket_io_client: ^2.0.3+1         # Socket.IO temps reel
+
+  # ============ Geolocalisation ============
+  geolocator: ^13.0.1                # Acces GPS
+  geocoding: ^3.0.0                  # Optionnel : reverse geocoding
+
+  # ============ Cartographie ============
+  google_maps_flutter: ^2.9.0        # Carte Google Maps
+
+  # ============ Stockage local ============
+  shared_preferences: ^2.3.2         # Stockage simple cle/valeur (token JWT)
+  flutter_secure_storage: ^9.2.2     # Stockage securise pour le token
+
+  # ============ State management ============
+  provider: ^6.1.2                   # Provider pour la gestion d'etat
+
+  # ============ Background tasks ============
+  flutter_background_service: ^5.0.10  # Service en arriere-plan
+  permission_handler: ^11.3.1          # Demande de permissions
+
+  # ============ UI ============
+  intl: ^0.19.0                      # Formatage dates/nombres FR
+  flutter_svg: ^2.0.10               # Icones SVG si besoin
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+
+  # Assets si besoin
+  # assets:
+  #   - assets/images/
