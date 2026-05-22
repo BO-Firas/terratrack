@@ -1,7 +1,8 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { MapPin, Users, Building2, Map, Calendar, Bell, LogOut, Shield } from 'lucide-react';
-
+import Logo from './Logo';
+ 
 const navItems = [
   { to: '/map', label: 'Carte live', icon: MapPin },
   { to: '/agents', label: 'Agents', icon: Users },
@@ -10,17 +11,17 @@ const navItems = [
   { to: '/visits', label: 'Visites', icon: Calendar },
   { to: '/alerts', label: 'Alertes', icon: Bell },
 ];
-
+ 
 export default function Layout() {
   const { user, logout } = useAuth();
   const isAdmin = user?.role === 'admin';
   const navigate = useNavigate();
-
+ 
   function handleLogout() {
     logout();
     navigate('/login');
   }
-
+ 
   return (
     <div
       className="flex bg-[var(--bg-base)]"
@@ -49,7 +50,7 @@ export default function Layout() {
             </div>
           </div>
         </div>
-
+ 
         {/* Navigation */}
         <nav className="flex-1 px-3 py-4 space-y-0.5">
           <div className="text-[10px] font-semibold text-[var(--text-tertiary)] tracking-widest uppercase px-3 mb-2">
@@ -87,7 +88,7 @@ export default function Layout() {
             </NavLink>
           )}
         </nav>
-
+ 
         {/* Profil utilisateur */}
         <div
           className="p-3"
@@ -99,7 +100,7 @@ export default function Layout() {
               style={{
                 background:
                   'linear-gradient(135deg, var(--accent-primary), #34d399)',
-                color: '#052e1c',
+                color: '#ffffff',
               }}
             >
               {user?.fullName?.charAt(0) || '?'}
@@ -122,7 +123,7 @@ export default function Layout() {
           </button>
         </div>
       </aside>
-
+ 
       {/* Contenu principal */}
       <main className="flex-1 overflow-hidden" style={{ minWidth: 0 }}>
         <Outlet />
