@@ -19,21 +19,22 @@ function haversineDistance(coords1, coords2) {
 }
 
 /**
- * Verifie si une position est dans le geofence d'un client
- * Logique principale du geofencing automatique
+ * Logique principale du geofencing automatique avec gestion du chevauchement.
  *
- * Cette fonction:
- * 1. Cherche les clients proches du point
- * 2. Pour chaque client dans le rayon: ouvre une visite si pas deja ouverte
- * 3. Pour les visites en cours dont l'agent n'est plus dans le rayon: ferme la visite
+ * Pour une nouvelle position :
+ *  - 0 client dans le rayon  -> aucune visite
+ *  - 1 client dans le rayon  -> visite auto, confirmee
+ *  - 2+ clients (chevauchement) -> visite auto sur le PLUS PROCHE,
+ *       marquee "non confirmee", avec la liste des candidats. L'app mobile
+ *       demandera a l'agent de confirmer/corriger.
  *
- * @returns { entered: [Visit], exited: [Visit] }
+ * @returns { entered: [Visit], exited: [Visit], needsSelection: {visit, candidates}|null }
  */
 async function processGeofencing(agentId, coordinates) {
-  const result = { entered: [], exited: [] };
+  const result = { entered: [], exited: [], needsSelection: null };
   const [lng, lat] = coordinates;
 
-  // 1. Trouver les clients dans un rayon de 200m (assez large pour couvrir les geofences max)
+  // 1. Trouver les clients proches (200m large pour couvrir les geofences max)
   const nearbyClients = await Client.find({
     isActive: true,
     location: {
@@ -44,48 +45,64 @@ async function processGeofencing(agentId, coordinates) {
     },
   });
 
-  // 2. Trouver les visites en cours pour cet agent
-  const ongoingVisits = await Visit.find({
-    agent: agentId,
-    status: 'in_progress',
-  });
-
-  const ongoingClientIds = new Set(ongoingVisits.map((v) => String(v.client)));
-
-  // 3. Pour chaque client proche : verifier si on est dans son rayon
+  // 2. Determiner les clients dont le geofence CONTIENT reellement le point
+  const clientsInside = [];
   for (const client of nearbyClients) {
     const distance = haversineDistance(coordinates, client.location.coordinates);
-    const insideGeofence = distance <= client.geofenceRadius;
+    if (distance <= client.geofenceRadius) {
+      clientsInside.push({ client, distance });
+    }
+  }
+  // Trier par distance croissante (le plus proche en premier)
+  clientsInside.sort((a, b) => a.distance - b.distance);
 
-    if (insideGeofence && !ongoingClientIds.has(String(client._id))) {
-      // Entree dans le geofence -> nouvelle visite
+  // 3. Visites en cours pour cet agent
+  const ongoingVisits = await Visit.find({ agent: agentId, status: 'in_progress' });
+  const ongoingClientIds = new Set(ongoingVisits.map((v) => String(v.client)));
+
+  // 4. ENTREE : s'il y a au moins un client dans le rayon et aucune visite
+  //    deja ouverte pour le client le plus proche
+  if (clientsInside.length > 0) {
+    const closest = clientsInside[0];
+    const closestId = String(closest.client._id);
+
+    if (!ongoingClientIds.has(closestId)) {
+      const overlap = clientsInside.length > 1;
+
       const visit = await Visit.create({
         agent: agentId,
-        client: client._id,
+        client: closest.client._id,
         enteredAt: new Date(),
         entryLocation: { type: 'Point', coordinates },
         status: 'in_progress',
+        isConfirmed: !overlap, // confirme seulement s'il n'y a pas de chevauchement
+        candidateClients: overlap ? clientsInside.map((c) => c.client._id) : [],
       });
       result.entered.push(visit);
+
+      // Si chevauchement -> demander a l'agent de choisir
+      if (overlap) {
+        result.needsSelection = {
+          visitId: visit._id,
+          candidates: clientsInside.map((c) => ({
+            _id: c.client._id,
+            name: c.client.name,
+            type: c.client.type,
+            address: c.client.address,
+            distance: Math.round(c.distance),
+          })),
+        };
+      }
     }
   }
 
-  // 4. Pour les visites en cours: si l'agent est sorti, fermer la visite
+  // 5. SORTIE : fermer les visites dont l'agent n'est plus dans le rayon
+  const insideIds = new Set(clientsInside.map((c) => String(c.client._id)));
   for (const visit of ongoingVisits) {
-    const client = nearbyClients.find((c) => String(c._id) === String(visit.client));
-
-    let stillInside = false;
-    if (client) {
-      const distance = haversineDistance(coordinates, client.location.coordinates);
-      stillInside = distance <= client.geofenceRadius;
-    }
-
-    if (!stillInside) {
-      // Fermer la visite et evaluer sa duree
+    if (!insideIds.has(String(visit.client))) {
       await visit.endVisit(coordinates);
 
-      // Recharger le client pour evaluer la duree (peut etre absent de nearbyClients si tres loin)
-      const fullClient = client || (await Client.findById(visit.client));
+      const fullClient = await Client.findById(visit.client);
       if (fullClient) {
         const minSec = (fullClient.expectedVisitDuration?.min || 5) * 60;
         const maxSec = (fullClient.expectedVisitDuration?.max || 60) * 60;
@@ -114,7 +131,6 @@ async function processGeofencing(agentId, coordinates) {
           });
         }
       }
-
       result.exited.push(visit);
     }
   }
@@ -123,41 +139,31 @@ async function processGeofencing(agentId, coordinates) {
 }
 
 /**
- * Verifie si l'agent est dans une de ses zones autorisees
- * Genere une alerte de sortie de zone si necessaire
+ * Verifie si l'agent est dans une de ses zones autorisees.
+ * Genere une alerte de sortie de zone si necessaire.
  */
 async function checkAuthorizedZone(agent, coordinates) {
   if (!agent.assignedZones || agent.assignedZones.length === 0) {
-    return { inAuthorizedZone: true, alert: null }; // pas de zone assignee = pas de restriction
+    return { inAuthorizedZone: true, alert: null };
   }
 
   const [lng, lat] = coordinates;
-
-  // Verifier si le point est dans au moins une zone assignee
   const matchingZone = await Zone.findOne({
     _id: { $in: agent.assignedZones },
     isActive: true,
     area: {
-      $geoIntersects: {
-        $geometry: { type: 'Point', coordinates: [lng, lat] },
-      },
+      $geoIntersects: { $geometry: { type: 'Point', coordinates: [lng, lat] } },
     },
   });
 
-  if (matchingZone) {
-    return { inAuthorizedZone: true, alert: null };
-  }
+  if (matchingZone) return { inAuthorizedZone: true, alert: null };
 
-  // Hors zone - generer une alerte (mais pas en doublon dans les 5 dernieres minutes)
   const recentAlert = await Alert.findOne({
     agent: agent._id,
     type: 'out_of_zone',
     createdAt: { $gte: new Date(Date.now() - 5 * 60 * 1000) },
   });
-
-  if (recentAlert) {
-    return { inAuthorizedZone: false, alert: null };
-  }
+  if (recentAlert) return { inAuthorizedZone: false, alert: null };
 
   const alert = await Alert.create({
     agent: agent._id,
@@ -170,8 +176,4 @@ async function checkAuthorizedZone(agent, coordinates) {
   return { inAuthorizedZone: false, alert };
 }
 
-module.exports = {
-  haversineDistance,
-  processGeofencing,
-  checkAuthorizedZone,
-};
+module.exports = { haversineDistance, processGeofencing, checkAuthorizedZone };

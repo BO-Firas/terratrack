@@ -16,6 +16,8 @@ const clientRoutes = require('./routes/clientRoutes');
 const zoneRoutes = require('./routes/zoneRoutes');
 const visitRoutes = require('./routes/visitRoutes');
 const alertRoutes = require('./routes/alertRoutes');
+const userRoutes = require('./routes/userRoutes');
+const statsRoutes = require('./routes/statsRoutes');
 
 const app = express();
 const server = http.createServer(app);
@@ -47,6 +49,8 @@ app.use('/api/clients', clientRoutes);
 app.use('/api/zones', zoneRoutes);
 app.use('/api/visits', visitRoutes);
 app.use('/api/alerts', alertRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/stats', statsRoutes);
 
 // 404 handler
 app.use((req, res) => {

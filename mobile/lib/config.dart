@@ -7,8 +7,8 @@ class AppConfig {
   static const String tagline = 'Field Operations';
 
   // URL du backend - 10.0.2.2 = adresse du PC depuis l'emulateur Android
-  static const String apiBaseUrl = 'http://10.0.2.2:5000/api';
-  static const String socketUrl = 'http://10.0.2.2:5000';
+  static const String apiBaseUrl = 'https://terratrack-backend.onrender.com/api';
+  static const String socketUrl = 'https://terratrack-backend.onrender.com';
 
   // Cle API Google Maps
   static const String googleMapsApiKey = 'AIzaSyCHPhwXTNc6VOk7sp2Yqx7UKhDhrlXsMlc';

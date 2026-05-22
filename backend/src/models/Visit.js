@@ -15,18 +15,9 @@ const visitSchema = new mongoose.Schema(
       required: true,
       index: true,
     },
-    enteredAt: {
-      type: Date,
-      required: true,
-      index: true,
-    },
-    leftAt: {
-      type: Date, // null tant que l'agent est sur place
-    },
-    durationSeconds: {
-      type: Number, // calcule a la sortie
-    },
-    // Position d'entree (peut differer un peu du centre du client)
+    enteredAt: { type: Date, required: true, index: true },
+    leftAt: { type: Date },
+    durationSeconds: { type: Number },
     entryLocation: {
       type: { type: String, enum: ['Point'], default: 'Point' },
       coordinates: [Number],
@@ -35,25 +26,28 @@ const visitSchema = new mongoose.Schema(
       type: { type: String, enum: ['Point'], default: 'Point' },
       coordinates: [Number],
     },
-    // Statut de la visite
     status: {
       type: String,
       enum: ['in_progress', 'completed', 'too_short', 'too_long', 'cancelled'],
       default: 'in_progress',
     },
-    notes: String, // l'agent peut ajouter des notes manuellement
+    // ===== Gestion du chevauchement de geofences =====
+    // Quand plusieurs clients se chevauchent, la visite demarre automatiquement
+    // sur le client le plus proche mais reste "non confirmee" tant que l'agent
+    // n'a pas valide (ou corrige) le client reellement visite.
+    isConfirmed: { type: Boolean, default: true, index: true },
+    candidateClients: [
+      { type: mongoose.Schema.Types.ObjectId, ref: 'Client' },
+    ],
+    notes: String,
   },
   { timestamps: true }
 );
 
-// Methode utilitaire : terminer une visite et calculer la duree
 visitSchema.methods.endVisit = function (exitLocation) {
   this.leftAt = new Date();
   this.durationSeconds = Math.round((this.leftAt - this.enteredAt) / 1000);
   if (exitLocation) this.exitLocation = exitLocation;
-
-  // Determiner le statut selon la duree (par rapport aux attentes du client)
-  // Cette logique peut etre raffinee en allant chercher client.expectedVisitDuration
   this.status = 'completed';
   return this.save();
 };

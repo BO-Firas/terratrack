@@ -6,7 +6,6 @@ exports.list = async (req, res, next) => {
     const { agent, client, date, status } = req.query;
     const filter = {};
 
-    // Un agent ne peut voir que ses propres visites
     if (req.user.role === 'agent') {
       filter.agent = req.user._id;
     } else if (agent) {
@@ -27,6 +26,7 @@ exports.list = async (req, res, next) => {
     const visits = await Visit.find(filter)
       .populate('client', 'name type address location')
       .populate('agent', 'fullName email')
+      .populate('candidateClients', 'name type address')
       .sort({ enteredAt: -1 });
 
     res.json({ visits });
@@ -46,9 +46,59 @@ exports.today = async (req, res, next) => {
       enteredAt: { $gte: startOfDay },
     })
       .populate('client', 'name type address')
+      .populate('candidateClients', 'name type address')
       .sort({ enteredAt: -1 });
 
     res.json({ visits });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// GET /api/visits/pending - visites non confirmees de l'agent (chevauchement)
+exports.pending = async (req, res, next) => {
+  try {
+    const visits = await Visit.find({
+      agent: req.user._id,
+      isConfirmed: false,
+    })
+      .populate('client', 'name type address')
+      .populate('candidateClients', 'name type address')
+      .sort({ enteredAt: -1 });
+
+    res.json({ visits });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// PUT /api/visits/:id/confirm - l'agent confirme/corrige le client visite
+// Body : { clientId }  (un des candidats)
+exports.confirmVisit = async (req, res, next) => {
+  try {
+    const { clientId } = req.body;
+    if (!clientId) {
+      return res.status(400).json({ message: 'clientId requis' });
+    }
+
+    const visit = await Visit.findOne({ _id: req.params.id, agent: req.user._id });
+    if (!visit) return res.status(404).json({ message: 'Visite introuvable' });
+
+    // Verifier que le client choisi fait bien partie des candidats
+    const candidateIds = visit.candidateClients.map((c) => String(c));
+    if (candidateIds.length && !candidateIds.includes(String(clientId))) {
+      return res.status(400).json({ message: 'Client non valide pour cette visite' });
+    }
+
+    visit.client = clientId;
+    visit.isConfirmed = true;
+    await visit.save();
+
+    const populated = await Visit.findById(visit._id)
+      .populate('client', 'name type address')
+      .populate('candidateClients', 'name type address');
+
+    res.json({ visit: populated });
   } catch (error) {
     next(error);
   }

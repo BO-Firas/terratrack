@@ -12,7 +12,7 @@
 const { io } = require('socket.io-client');
 const axios = require('axios');
 
-const BACKEND_URL = 'http://localhost:5000';
+const BACKEND_URL = 'https://terratrack-backend.onrender.com';
 const EMAIL = process.argv[2] || 'agent1@terratrack.tn';
 const PASSWORD = 'agent123';
 

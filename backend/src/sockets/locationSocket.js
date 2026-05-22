@@ -115,6 +115,11 @@ function setupSocketHandlers(io) {
           });
         }
 
+        // 4bis. Chevauchement de geofences -> demander a l'agent de choisir
+        if (geofenceResult.needsSelection) {
+          socket.emit('visit:selection_needed', geofenceResult.needsSelection);
+        }
+
         // 5. Verification de la zone autorisee
         const zoneCheck = await checkAuthorizedZone(user, coordinates);
         if (!zoneCheck.inAuthorizedZone && zoneCheck.alert) {

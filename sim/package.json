@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node simulator.js",
     "agent1": "node simulator.js agent1@pfe.tn",
-    "agent2": "node simulator.js agent2@pfe.tn"
+    "agent2": "node simulator.js agent2@terratrack.tn"
   },
   "dependencies": {
     "axios": "^1.7.7",
