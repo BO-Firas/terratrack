@@ -2,10 +2,12 @@ import { useEffect, useState } from 'react';
 import { agentsAPI } from '../services/api';
 import PageHeader from '../components/PageHeader';
 import { MapPin, Phone, Mail, Activity } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export default function AgentsPage() {
   const [agents, setAgents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     agentsAPI
@@ -45,7 +47,9 @@ export default function AgentsPage() {
               return (
                 <div
                   key={agent._id}
+                  onClick={() => navigate(`/agents/${agent._id}`)}
                   className="tt-card tt-card-hover p-5 fade-in"
+                  style={{ cursor: 'pointer' }}
                 >
                   <div className="flex items-start gap-3 mb-4">
                     <div

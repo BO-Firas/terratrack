@@ -76,3 +76,9 @@ export const alertsAPI = {
   markRead: (id) => api.put(`/alerts/${id}/read`),
   resolve: (id) => api.put(`/alerts/${id}/resolve`),
 };
+
+export const statsAPI = {
+  me: () => api.get('/stats/me'),
+  agent: (id) => api.get(`/stats/agent/${id}`),
+  overview: () => api.get('/stats/overview'),
+};
