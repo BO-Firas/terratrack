@@ -22,31 +22,31 @@ class AppConfig {
   static const double defaultLongitude = 10.0982;
 }
 
-/// Palette de couleurs TerraTrack - dark mode
+/// Palette de couleurs TerraTrack - light mode
 class AppColors {
   // Backgrounds
-  static const Color bgBase = Color(0xFF0A0E14);
-  static const Color bgElevated = Color(0xFF11161D);
-  static const Color bgOverlay = Color(0xFF1A212B);
-  static const Color bgHover = Color(0xFF1F2730);
+  static const Color bgBase = Color(0xFFF4F6F9);     // gris tres clair
+  static const Color bgElevated = Color(0xFFFFFFFF); // blanc (cartes)
+  static const Color bgOverlay = Color(0xFFFFFFFF);
+  static const Color bgHover = Color(0xFFEEF1F5);
 
   // Text
-  static const Color textPrimary = Color(0xFFF8FAFC);
-  static const Color textSecondary = Color(0xFF94A3B8);
-  static const Color textTertiary = Color(0xFF64748B);
+  static const Color textPrimary = Color(0xFF0F172A);   // slate-900
+  static const Color textSecondary = Color(0xFF475569); // slate-600
+  static const Color textTertiary = Color(0xFF94A3B8);  // slate-400
 
-  // Accent emerald
-  static const Color accent = Color(0xFF10B981);
-  static const Color accentLight = Color(0xFF34D399);
-  static const Color accentDark = Color(0xFF052E1C);
+  // Accent emerald (plus fonce pour etre lisible sur blanc)
+  static const Color accent = Color(0xFF059669);      // emerald-600
+  static const Color accentLight = Color(0xFF10B981); // emerald-500
+  static const Color accentDark = Color(0xFFFFFFFF);  // texte sur boutons accent = blanc
 
   // Status
-  static const Color success = Color(0xFF10B981);
-  static const Color warning = Color(0xFFF59E0B);
-  static const Color danger = Color(0xFFEF4444);
-  static const Color info = Color(0xFF3B82F6);
+  static const Color success = Color(0xFF059669);
+  static const Color warning = Color(0xFFD97706);
+  static const Color danger = Color(0xFFDC2626);
+  static const Color info = Color(0xFF2563EB);
 
   // Borders
-  static Color borderSubtle = Colors.white.withOpacity(0.06);
-  static Color borderDefault = Colors.white.withOpacity(0.1);
+  static Color borderSubtle = Colors.black.withOpacity(0.07);
+  static Color borderDefault = Colors.black.withOpacity(0.12);
 }

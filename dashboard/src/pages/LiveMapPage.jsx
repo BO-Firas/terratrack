@@ -32,79 +32,25 @@ const clientTypeColors = {
 
 // Style dark mode Google Maps - design custom inspire des cartes pro
 const darkMapStyle = [
-  { elementType: 'geometry', stylers: [{ color: '#1d2129' }] },
-  { elementType: 'labels.text.stroke', stylers: [{ color: '#1d2129' }] },
-  { elementType: 'labels.text.fill', stylers: [{ color: '#8a93a3' }] },
-  {
-    featureType: 'administrative.locality',
-    elementType: 'labels.text.fill',
-    stylers: [{ color: '#d59563' }],
-  },
-  {
-    featureType: 'poi',
-    elementType: 'labels.text.fill',
-    stylers: [{ color: '#6b7280' }],
-  },
-  {
-    featureType: 'poi.park',
-    elementType: 'geometry',
-    stylers: [{ color: '#263c3f' }],
-  },
-  {
-    featureType: 'poi.park',
-    elementType: 'labels.text.fill',
-    stylers: [{ color: '#6b9a76' }],
-  },
-  {
-    featureType: 'road',
-    elementType: 'geometry',
-    stylers: [{ color: '#2a313c' }],
-  },
-  {
-    featureType: 'road',
-    elementType: 'geometry.stroke',
-    stylers: [{ color: '#1d2129' }],
-  },
-  {
-    featureType: 'road',
-    elementType: 'labels.text.fill',
-    stylers: [{ color: '#9ca5b3' }],
-  },
-  {
-    featureType: 'road.highway',
-    elementType: 'geometry',
-    stylers: [{ color: '#3f4855' }],
-  },
-  {
-    featureType: 'road.highway',
-    elementType: 'geometry.stroke',
-    stylers: [{ color: '#1d2129' }],
-  },
-  {
-    featureType: 'road.highway',
-    elementType: 'labels.text.fill',
-    stylers: [{ color: '#f3d19c' }],
-  },
-  {
-    featureType: 'transit',
-    elementType: 'geometry',
-    stylers: [{ color: '#2f3948' }],
-  },
-  {
-    featureType: 'water',
-    elementType: 'geometry',
-    stylers: [{ color: '#0f1419' }],
-  },
-  {
-    featureType: 'water',
-    elementType: 'labels.text.fill',
-    stylers: [{ color: '#4a5e7a' }],
-  },
-  {
-    featureType: 'poi.business',
-    stylers: [{ visibility: 'off' }],
-  },
+  { elementType: 'geometry', stylers: [{ color: '#f4f6f9' }] },
+  { elementType: 'labels.text.stroke', stylers: [{ color: '#f4f6f9' }] },
+  { elementType: 'labels.text.fill', stylers: [{ color: '#64748b' }] },
+  { featureType: 'administrative.locality', elementType: 'labels.text.fill', stylers: [{ color: '#475569' }] },
+  { featureType: 'poi', elementType: 'labels.text.fill', stylers: [{ color: '#94a3b8' }] },
+  { featureType: 'poi.park', elementType: 'geometry', stylers: [{ color: '#dcfce7' }] },
+  { featureType: 'poi.park', elementType: 'labels.text.fill', stylers: [{ color: '#16a34a' }] },
+  { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#ffffff' }] },
+  { featureType: 'road', elementType: 'geometry.stroke', stylers: [{ color: '#e2e8f0' }] },
+  { featureType: 'road', elementType: 'labels.text.fill', stylers: [{ color: '#94a3b8' }] },
+  { featureType: 'road.highway', elementType: 'geometry', stylers: [{ color: '#fef9c3' }] },
+  { featureType: 'road.highway', elementType: 'geometry.stroke', stylers: [{ color: '#fde68a' }] },
+  { featureType: 'road.highway', elementType: 'labels.text.fill', stylers: [{ color: '#a16207' }] },
+  { featureType: 'transit', elementType: 'geometry', stylers: [{ color: '#e2e8f0' }] },
+  { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#bae6fd' }] },
+  { featureType: 'water', elementType: 'labels.text.fill', stylers: [{ color: '#0284c7' }] },
+  { featureType: 'poi.business', stylers: [{ visibility: 'off' }] },
 ];
+
 
 export default function LiveMapPage() {
   const mapContainerRef = useRef(null);
@@ -133,7 +79,7 @@ export default function LiveMapPage() {
             position: google.maps.ControlPosition.LEFT_BOTTOM,
           },
           styles: darkMapStyle,
-          backgroundColor: '#0a0e14',
+          backgroundColor: '#f4f6f9',
         });
         mapRef.current = map;
 
@@ -200,7 +146,7 @@ export default function LiveMapPage() {
                 scale: 9,
                 fillColor: color,
                 fillOpacity: 1,
-                strokeColor: '#0a0e14',
+                strokeColor: '#ffffff',
                 strokeWeight: 2,
               },
             });
@@ -314,7 +260,7 @@ export default function LiveMapPage() {
       {/* Carte */}
       <div
         className="flex-1 relative"
-        style={{ minWidth: 0, minHeight: 0, backgroundColor: '#0a0e14' }}
+        style={{ minWidth: 0, minHeight: 0, backgroundColor: '#f4f6f9' }}
       >
         <div
           ref={mapContainerRef}
@@ -356,15 +302,15 @@ export default function LiveMapPage() {
             Agent terrain
           </div>
           <div className="flex items-center gap-2.5 text-[var(--text-secondary)]">
-            <span className="w-3 h-3 rounded-full bg-emerald-500 border-2 border-[#0a0e14]"></span>
+            <span className="w-3 h-3 rounded-full bg-emerald-500 border-2 border-white"></span>
             Pharmacie
           </div>
           <div className="flex items-center gap-2.5 text-[var(--text-secondary)]">
-            <span className="w-3 h-3 rounded-full bg-red-500 border-2 border-[#0a0e14]"></span>
+            <span className="w-3 h-3 rounded-full bg-red-500 border-2 border-white"></span>
             Hopital
           </div>
           <div className="flex items-center gap-2.5 text-[var(--text-secondary)]">
-            <span className="w-3 h-3 rounded-full bg-amber-500 border-2 border-[#0a0e14]"></span>
+            <span className="w-3 h-3 rounded-full bg-amber-500 border-2 border-white"></span>
             Medecin
           </div>
         </div>
@@ -447,13 +393,12 @@ export default function LiveMapPage() {
                   className="p-3 rounded-lg fade-in"
                   style={{
                     backgroundColor: 'var(--bg-base)',
-                    border: `1px solid ${
-                      event.action === 'alert'
+                    border: `1px solid ${event.action === 'alert'
                         ? 'rgba(239, 68, 68, 0.3)'
                         : event.action === 'entered'
-                        ? 'rgba(16, 185, 129, 0.3)'
-                        : 'var(--border-subtle)'
-                    }`,
+                          ? 'rgba(16, 185, 129, 0.3)'
+                          : 'var(--border-subtle)'
+                      }`,
                   }}
                 >
                   <div className="flex items-center gap-2 mb-1">
@@ -464,8 +409,8 @@ export default function LiveMapPage() {
                           event.action === 'alert'
                             ? 'var(--color-danger)'
                             : event.action === 'entered'
-                            ? 'var(--color-success)'
-                            : 'var(--text-tertiary)',
+                              ? 'var(--color-success)'
+                              : 'var(--text-tertiary)',
                       }}
                     />
                     <span className="text-xs font-medium text-[var(--text-primary)]">
@@ -517,7 +462,7 @@ function createAgentMarker(google, map, agent, position) {
       encodeURIComponent(`
       <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
         <circle cx="24" cy="24" r="22" fill="#10b981" opacity="0.15"/>
-        <circle cx="24" cy="24" r="16" fill="#10b981" stroke="#052e1c" stroke-width="3"/>
+        <circle cx="24" cy="24" r="16" fill="#10b981" stroke="#ffffff" stroke-width="3"/>
         <text x="24" y="30" text-anchor="middle" fill="white" font-family="Manrope,sans-serif" font-size="14" font-weight="700">${initial}</text>
       </svg>
     `),

@@ -13,9 +13,9 @@ void main() {
   // Status bar transparent + texte clair
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
-    statusBarIconBrightness: Brightness.light,
-    systemNavigationBarColor: Color(0xFF0A0E14),
-    systemNavigationBarIconBrightness: Brightness.light,
+    statusBarIconBrightness: Brightness.dark,
+    systemNavigationBarColor: Color(0xFFFFFFFF),
+    systemNavigationBarIconBrightness: Brightness.dark,
   ));
 
   runApp(const TerraTrackApp());
@@ -41,10 +41,10 @@ class TerraTrackApp extends StatelessWidget {
 
   ThemeData _buildDarkTheme() {
     return ThemeData(
-      brightness: Brightness.dark,
+      brightness: Brightness.light,
       useMaterial3: true,
       scaffoldBackgroundColor: AppColors.bgBase,
-      colorScheme: ColorScheme.dark(
+      colorScheme: ColorScheme.light(
         primary: AppColors.accent,
         onPrimary: AppColors.accentDark,
         secondary: AppColors.accentLight,

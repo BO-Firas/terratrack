@@ -8,44 +8,44 @@
 @import 'leaflet/dist/leaflet.css';
 
 /* ==========================================================
-   TerraTrack - Design System (Dark Mode)
+   TerraTrack - Design System (Light Mode)
    ========================================================== */
 
 :root {
-  /* Background layers - du plus profond au plus eleve */
-  --bg-base: #0a0e14;       /* fond le plus profond */
-  --bg-elevated: #11161d;   /* cartes, panneaux */
-  --bg-overlay: #1a212b;    /* dropdowns, modals */
-  --bg-hover: #1f2730;      /* hover states */
+  /* Background layers - du plus clair au plus contraste */
+  --bg-base: #f4f6f9;       /* fond general (gris tres clair) */
+  --bg-elevated: #ffffff;   /* cartes, panneaux (blanc) */
+  --bg-overlay: #ffffff;    /* dropdowns, modals */
+  --bg-hover: #eef1f5;      /* hover states */
 
   /* Borders */
-  --border-subtle: rgba(255, 255, 255, 0.06);
-  --border-default: rgba(255, 255, 255, 0.1);
-  --border-strong: rgba(255, 255, 255, 0.15);
+  --border-subtle: rgba(15, 23, 42, 0.07);
+  --border-default: rgba(15, 23, 42, 0.12);
+  --border-strong: rgba(15, 23, 42, 0.18);
 
   /* Text */
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-tertiary: #64748b;
-  --text-disabled: #475569;
+  --text-primary: #0f172a;   /* slate-900 */
+  --text-secondary: #475569; /* slate-600 */
+  --text-tertiary: #94a3b8;  /* slate-400 */
+  --text-disabled: #cbd5e1;  /* slate-300 */
 
-  /* Accents - vert emeraude pour TerraTrack (rappel "terra" = terre) */
-  --accent-primary: #10b981;     /* emerald-500 */
-  --accent-primary-hover: #34d399; /* emerald-400 */
-  --accent-primary-bg: rgba(16, 185, 129, 0.1);
-  --accent-primary-border: rgba(16, 185, 129, 0.3);
+  /* Accents - vert emeraude pour TerraTrack */
+  --accent-primary: #059669;     /* emerald-600 (plus fonce, lisible sur blanc) */
+  --accent-primary-hover: #047857; /* emerald-700 */
+  --accent-primary-bg: rgba(5, 150, 105, 0.1);
+  --accent-primary-border: rgba(5, 150, 105, 0.3);
 
   /* Statuts */
-  --color-success: #10b981;
-  --color-warning: #f59e0b;
-  --color-danger: #ef4444;
-  --color-info: #3b82f6;
+  --color-success: #059669;
+  --color-warning: #d97706;
+  --color-danger: #dc2626;
+  --color-info: #2563eb;
 
   /* Effects */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 12px -2px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 12px 32px -8px rgba(0, 0, 0, 0.5);
-  --shadow-glow: 0 0 24px rgba(16, 185, 129, 0.15);
+  --shadow-sm: 0 1px 2px 0 rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 4px 12px -2px rgba(15, 23, 42, 0.1);
+  --shadow-lg: 0 12px 32px -8px rgba(15, 23, 42, 0.18);
+  --shadow-glow: 0 0 24px rgba(5, 150, 105, 0.15);
 }
 
 *, *::before, *::after {
@@ -80,11 +80,11 @@ body {
   background: var(--bg-base);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--bg-overlay);
+  background: #d4dae2;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--bg-hover);
+  background: #c0c8d2;
 }
 
 /* Mono font helper */
@@ -99,11 +99,11 @@ body {
 @keyframes pulse-dot {
   0%, 100% {
     opacity: 1;
-    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+    box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.4);
   }
   50% {
     opacity: 0.85;
-    box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
+    box-shadow: 0 0 0 8px rgba(5, 150, 105, 0);
   }
 }
 
@@ -128,17 +128,18 @@ body {
   background-color: var(--bg-elevated);
   border: 1px solid var(--border-subtle);
   border-radius: 12px;
+  box-shadow: var(--shadow-sm);
 }
 
 .tt-card-hover:hover {
   border-color: var(--border-default);
-  background-color: var(--bg-overlay);
+  box-shadow: var(--shadow-md);
   transition: all 0.2s ease;
 }
 
 .tt-button-primary {
   background-color: var(--accent-primary);
-  color: #052e1c;
+  color: #ffffff;
   font-weight: 600;
   padding: 10px 18px;
   border-radius: 8px;
@@ -149,7 +150,7 @@ body {
 .tt-button-primary:hover:not(:disabled) {
   background-color: var(--accent-primary-hover);
   transform: translateY(-1px);
-  box-shadow: var(--shadow-md), 0 0 12px rgba(16, 185, 129, 0.25);
+  box-shadow: var(--shadow-md);
 }
 .tt-button-primary:disabled {
   opacity: 0.5;
@@ -172,26 +173,12 @@ body {
   box-shadow: 0 0 0 3px var(--accent-primary-bg);
 }
 
-/* Grid noise overlay - donne du grain a l'interface */
-.tt-noise {
-  position: relative;
-}
-.tt-noise::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image:
-    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
-  background-size: 4px 4px;
-  pointer-events: none;
-  z-index: 1;
-}
-
-/* Customisation des info windows Google Maps en dark */
+/* Customisation des info windows Google Maps en light */
 .gm-style-iw-c {
   background-color: var(--bg-elevated) !important;
   color: var(--text-primary) !important;
   border: 1px solid var(--border-default) !important;
+  box-shadow: var(--shadow-md) !important;
 }
 .gm-style-iw-d {
   color: var(--text-primary) !important;
@@ -199,9 +186,4 @@ body {
 }
 .gm-style-iw-tc::after {
   background: var(--bg-elevated) !important;
-}
-.gm-style-iw button[aria-label="Fermer"],
-.gm-style-iw button[aria-label="Close"] {
-  filter: invert(1) !important;
-  opacity: 0.7;
 }
