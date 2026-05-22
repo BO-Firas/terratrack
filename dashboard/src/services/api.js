@@ -82,3 +82,13 @@ export const statsAPI = {
   agent: (id) => api.get(`/stats/agent/${id}`),
   overview: () => api.get('/stats/overview'),
 };
+
+export const usersAPI = {
+  list: () => api.get('/users'),
+  get: (id) => api.get(`/users/${id}`),
+  create: (data) => api.post('/users', data),
+  update: (id, data) => api.put(`/users/${id}`, data),
+  resetPassword: (id, password) => api.put(`/users/${id}/password`, { password }),
+  toggle: (id) => api.put(`/users/${id}/toggle`),
+  remove: (id) => api.delete(`/users/${id}`),
+};

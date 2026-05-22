@@ -1,15 +1,6 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import {
-  MapPin,
-  Users,
-  Building2,
-  Map,
-  Calendar,
-  Bell,
-  LogOut,
-} from 'lucide-react';
-import Logo from './Logo';
+import { MapPin, Users, Building2, Map, Calendar, Bell, LogOut, Shield } from 'lucide-react';
 
 const navItems = [
   { to: '/map', label: 'Carte live', icon: MapPin },
@@ -22,6 +13,7 @@ const navItems = [
 
 export default function Layout() {
   const { user, logout } = useAuth();
+  const isAdmin = user?.role === 'admin';
   const navigate = useNavigate();
 
   function handleLogout() {
@@ -79,6 +71,21 @@ export default function Layout() {
               <span>{label}</span>
             </NavLink>
           ))}
+          {isAdmin && (
+            <NavLink
+              to="/users"
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                  isActive
+                    ? 'bg-[var(--accent-primary-bg)] text-[var(--accent-primary)]'
+                    : 'text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]'
+                }`
+              }
+            >
+              <Shield size={17} strokeWidth={2} />
+              <span>Utilisateurs</span>
+            </NavLink>
+          )}
         </nav>
 
         {/* Profil utilisateur */}
