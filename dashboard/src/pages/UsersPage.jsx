@@ -12,7 +12,7 @@ const roleLabels = {
 };
 
 const emptyForm = {
-  fullName: '', email: '', password: '', role: 'agent', phone: '', assignedZones: [],
+  fullName: '', email: '', password: '', role: 'agent', phone: '', assignedZones: [], dailyTarget: 0,
 };
 
 export default function UsersPage() {
@@ -58,6 +58,7 @@ export default function UsersPage() {
       role: user.role,
       phone: user.phone || '',
       assignedZones: (user.assignedZones || []).map((z) => z._id),
+      dailyTarget: user.dailyTarget || 0,
     });
     setError('');
     setModalOpen(true);
@@ -75,6 +76,7 @@ export default function UsersPage() {
         const payload = {
           fullName: form.fullName, email: form.email, phone: form.phone,
           role: form.role, assignedZones: form.role === 'agent' ? form.assignedZones : [],
+          dailyTarget: form.role === 'agent' ? Number(form.dailyTarget) || 0 : 0,
         };
         await usersAPI.update(editingId, payload);
       } else {
@@ -252,6 +254,18 @@ export default function UsersPage() {
                   );
                 })}
               </div>
+            </Field>
+          )}
+          {form.role === 'agent' && (
+            <Field label="Objectif quotidien (nombre de visites)">
+              <input
+                type="number"
+                min="0"
+                className="tt-input w-full"
+                value={form.dailyTarget}
+                onChange={(e) => setForm({ ...form, dailyTarget: e.target.value })}
+                placeholder="0 = aucun objectif"
+              />
             </Field>
           )}
           <div className="flex gap-2 mt-6">
