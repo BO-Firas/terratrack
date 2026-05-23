@@ -8,6 +8,8 @@ const { Server } = require('socket.io');
 const connectDB = require('./config/database');
 const errorHandler = require('./middleware/errorHandler');
 const setupSocketHandlers = require('./sockets/locationSocket');
+const reportRoutes = require('./routes/reportRoutes');
+const { startScheduledJobs } = require('./jobs/inactivityJob');
 
 // Routes
 const authRoutes = require('./routes/authRoutes');
@@ -51,6 +53,7 @@ app.use('/api/visits', visitRoutes);
 app.use('/api/alerts', alertRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/stats', statsRoutes);
+app.use('/api/reports', reportRoutes);
 
 // 404 handler
 app.use((req, res) => {
@@ -65,6 +68,7 @@ const io = new Server(server, {
   cors: corsOptions,
 });
 setupSocketHandlers(io);
+startScheduledJobs(io);
 
 // Demarrage
 const PORT = process.env.PORT || 5000;

@@ -77,4 +77,11 @@ class ApiService {
   Future<Response> markAlertRead(String alertId) {
     return _dio.put('/alerts/$alertId/read');
   }
+  // Confirmer le client visite (chevauchement de geofences)
+  Future<Response> confirmVisit(String visitId, String clientId) {
+    return _dio.put('/visits/$visitId/confirm', data: {'clientId': clientId});
+  }
+
+  // Statistiques de l'agent connecte
+  Future<Response> getMyStats() => _dio.get('/stats/me');
 }

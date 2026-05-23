@@ -43,6 +43,9 @@ class AppState extends ChangeNotifier {
   Client? _currentClient; // client dans le geofence duquel on est
   Client? get currentClient => _currentClient;
 
+  String? _pendingSelectionVisitId; List<Map<String, dynamic>> _pendingCandidates = [];
+  String? get pendingSelectionVisitId => _pendingSelectionVisitId; List<Map<String, dynamic>> get pendingCandidates => _pendingCandidates;
+
   String? _lastError;
   String? get lastError => _lastError;
 
@@ -83,6 +86,13 @@ class AppState extends ChangeNotifier {
         notifyListeners();
       }
     };
+
+    socketService.onSelectionNeeded = (visitId, candidates) {
+      _pendingSelectionVisitId = visitId;
+      _pendingCandidates = candidates;
+      notifyListeners();
+    };
+
   }
 
   // ============ Demarrage / arret du suivi ============
@@ -196,4 +206,23 @@ class AppState extends ChangeNotifier {
     socketService.disconnect();
     super.dispose();
   }
+
+  // Confirmer la location choisie par l'agent
+  Future<void> confirmVisitLocation(String clientId) async {
+    final visitId = _pendingSelectionVisitId;
+    if (visitId == null) return;
+    try {
+      await apiService.confirmVisit(visitId, clientId);
+    } catch (_) {}
+    _pendingSelectionVisitId = null;
+    _pendingCandidates = [];
+    notifyListeners();
+  }
+
+  void clearPendingSelection() {
+    _pendingSelectionVisitId = null;
+    _pendingCandidates = [];
+    notifyListeners();
+  }
+
 }

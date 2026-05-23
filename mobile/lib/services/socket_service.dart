@@ -12,6 +12,7 @@ class SocketService {
   void Function(Visit visit)? onVisitEntered;
   void Function(Visit visit)? onVisitExited;
   void Function(Map<String, dynamic> alert)? onZoneAlert;
+  void Function(String visitId, List<Map<String, dynamic>> candidates)? onSelectionNeeded;
 
   /// Connexion au serveur Socket.IO avec authentification JWT
   void connect(String token) {
@@ -61,6 +62,17 @@ class SocketService {
     _socket!.on('alert:zone', (data) {
       if (data is Map && data['alert'] != null) {
         onZoneAlert?.call(Map<String, dynamic>.from(data['alert']));
+      }
+    });
+
+    // Chevauchement de geofences -> l'agent doit choisir la location
+    _socket!.on('visit:selection_needed', (data) {
+      if (data is Map && data['candidates'] != null) {
+        final visitId = data['visitId'].toString();
+        final candidates = (data['candidates'] as List)
+          .map((c) => Map<String, dynamic>.from(c))
+          .toList();
+        onSelectionNeeded?.call(visitId, candidates);
       }
     });
 

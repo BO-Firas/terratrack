@@ -92,3 +92,7 @@ export const usersAPI = {
   toggle: (id) => api.put(`/users/${id}/toggle`),
   remove: (id) => api.delete(`/users/${id}`),
 };
+
+export const reportsAPI = {
+  daily: (agentId, date) => api.get('/reports/daily', { params: { agent: agentId, date } }),
+};

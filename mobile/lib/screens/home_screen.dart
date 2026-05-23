@@ -7,6 +7,8 @@ import 'dashboard_screen.dart';
 import 'map_screen.dart';
 import 'visits_screen.dart';
 import 'login_screen.dart';
+import '../widgets/location_selection_dialog.dart';
+import 'performance_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -23,9 +25,10 @@ class _HomeScreenState extends State<HomeScreen> {
     DashboardScreen(),
     MapScreen(),
     VisitsScreen(),
+    PerformanceScreen(),
   ];
 
-  final _titles = const ['Accueil', 'Carte', 'Visites'];
+  final _titles = const ['Accueil', 'Carte', 'Visites', 'Perf'];
 
   @override
   void initState() {
@@ -105,6 +108,27 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final appState = context.watch<AppState>();
+    // Afficher le dialogue de selection si le backend le demande
+if (appState.pendingSelectionVisitId != null &&
+    appState.pendingCandidates.isNotEmpty) {
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    if (!mounted) return;
+    // Eviter d'ouvrir plusieurs fois
+    if (ModalRoute.of(context)?.isCurrent != true) return;
+    final candidates = appState.pendingCandidates;
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (_) => LocationSelectionDialog(
+        candidates: candidates,
+        onConfirm: (clientId) => appState.confirmVisitLocation(clientId),
+      ),
+    ).then((_) {
+      // Si ferme sans choisir, on nettoie (la visite reste non confirmee)
+      appState.clearPendingSelection();
+    });
+  });
+}
     final user = appState.currentUser;
 
     return Scaffold(
@@ -213,6 +237,11 @@ class _HomeScreenState extends State<HomeScreen> {
               icon: Icon(Icons.list_alt_outlined),
               activeIcon: Icon(Icons.list_alt),
               label: 'Visites',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.bar_chart_outlined),
+              activeIcon: Icon(Icons.bar_chart),
+              label: 'Perf',
             ),
           ],
         ),

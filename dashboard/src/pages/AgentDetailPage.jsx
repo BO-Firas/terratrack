@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { statsAPI } from '../services/api';
 import {
   ArrowLeft, MapPin, Phone, Mail, Clock, CheckCircle,
-  Calendar, AlertTriangle, TrendingUp, Activity,
+  Calendar, AlertTriangle, TrendingUp, Activity, FileText,
 } from 'lucide-react';
 
 const typeLabels = {
@@ -70,16 +70,25 @@ export default function AgentDetailPage() {
             </span>
           </div>
         </div>
-        {agent.assignedZones?.length > 0 && (
-          <div className="flex gap-1.5">
-            {agent.assignedZones.map((z) => (
-              <span key={z._id} className="text-[10px] px-2 py-1 rounded-md font-medium"
-                style={{ backgroundColor: `${z.color}1a`, color: z.color, border: `1px solid ${z.color}40` }}>
-                {z.name}
-              </span>
-            ))}
-          </div>
-        )}
+        <div className="flex items-center gap-3">
+          {agent.assignedZones?.length > 0 && (
+            <div className="flex gap-1.5">
+              {agent.assignedZones.map((z) => (
+                <span key={z._id} className="text-[10px] px-2 py-1 rounded-md font-medium"
+                  style={{ backgroundColor: `${z.color}1a`, color: z.color, border: `1px solid ${z.color}40` }}>
+                  {z.name}
+                </span>
+              ))}
+            </div>
+          )}
+          <button
+            onClick={() => navigate(`/agents/${id}/report`)}
+            className="tt-button-primary flex items-center gap-2 whitespace-nowrap"
+          >
+            <FileText size={16} />
+            Rapport journalier
+          </button>
+        </div>
       </div>
 
       <div className="p-7 space-y-6">

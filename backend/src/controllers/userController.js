@@ -36,7 +36,7 @@ exports.getUser = async (req, res, next) => {
 // POST /api/users - creer un nouvel utilisateur (agent, superviseur ou admin)
 exports.createUser = async (req, res, next) => {
   try {
-    const { fullName, email, password, role, phone, assignedZones } = req.body;
+    const { fullName, email, password, role, phone, assignedZones, dailyTarget } = req.body;
 
     // Validation minimale
     if (!fullName || !email || !password || !role) {
@@ -63,6 +63,8 @@ exports.createUser = async (req, res, next) => {
       phone,
       // Les zones ne concernent que les agents
       assignedZones: role === 'agent' ? assignedZones || [] : [],
+      // Objectif quotidien (agents uniquement)
+      dailyTarget: role === 'agent' ? (dailyTarget || 0) : 0,
     });
 
     // Recharger sans le mot de passe et avec les zones peuplees
@@ -77,11 +79,12 @@ exports.createUser = async (req, res, next) => {
 // PUT /api/users/:id - modifier un utilisateur (nom, email, telephone, role, zones, etat)
 exports.updateUser = async (req, res, next) => {
   try {
-    const allowed = ['fullName', 'email', 'phone', 'role', 'assignedZones', 'isActive'];
+    const allowed = ['fullName', 'email', 'phone', 'role', 'assignedZones', 'isActive', 'dailyTarget'];
     const updates = {};
     for (const key of allowed) {
       if (req.body[key] !== undefined) updates[key] = req.body[key];
     }
+
 
     // Si l'email change, verifier qu'il n'est pas deja pris par un autre
     if (updates.email) {

@@ -56,6 +56,10 @@ const userSchema = new mongoose.Schema(
       },
       updatedAt: Date,
     },
+    dailyTarget: {
+      type: Number,
+      default: 0, // 0 = pas d'objectif defini
+    },
   },
   { timestamps: true }
 );
