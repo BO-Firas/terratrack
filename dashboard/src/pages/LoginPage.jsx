@@ -182,7 +182,7 @@ export default function LoginPage() {
               className="flex justify-between"
               style={{ color: 'var(--text-secondary)' }}
             >
-              <span>super@terratrack.tn</span>
+              <span>supervisor@terratrack.tn</span>
               <span style={{ color: 'var(--text-tertiary)' }}>super123</span>
             </div>
           </div>
