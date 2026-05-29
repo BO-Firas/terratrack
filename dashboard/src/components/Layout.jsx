@@ -6,7 +6,6 @@ import {LayoutDashboard, MapPin, Users, Building2, Map, Calendar, Bell, LogOut, 
 const navItems = [
   { to: '/', label: 'Tableau de bord', icon: LayoutDashboard },
   { to: '/map', label: 'Carte live', icon: MapPin },
-  { to: '/map', label: 'Carte live', icon: MapPin },
   { to: '/agents', label: 'Agents', icon: Users },
   { to: '/clients', label: 'Clients', icon: Building2 },
   { to: '/zones', label: 'Zones', icon: Map },
