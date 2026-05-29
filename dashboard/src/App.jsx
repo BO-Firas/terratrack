@@ -11,6 +11,7 @@ import AlertsPage from './pages/AlertsPage';
 import AgentDetailPage from './pages/AgentDetailPage';
 import UsersPage from './pages/UsersPage';
 import DailyReportPage from './pages/DailyReportPage';
+import OverviewPage from './pages/OverviewPage';
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -37,7 +38,7 @@ export default function App() {
           </ProtectedRoute>
         }
       >
-        <Route index element={<Navigate to="/map" replace />} />
+        <Route index element={<OverviewPage />} />
         <Route path="map" element={<LiveMapPage />} />
         <Route path="agents" element={<AgentsPage />} />
         <Route path="clients" element={<ClientsPage />} />

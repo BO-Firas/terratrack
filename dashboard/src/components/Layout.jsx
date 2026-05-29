@@ -2,8 +2,11 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { MapPin, Users, Building2, Map, Calendar, Bell, LogOut, Shield } from 'lucide-react';
 import Logo from './Logo';
- 
+import {LayoutDashboard, MapPin, Users, Building2, Map, Calendar, Bell, LogOut, Shield,} from 'lucide-react';
+
 const navItems = [
+  { to: '/', label: 'Tableau de bord', icon: LayoutDashboard },
+  { to: '/map', label: 'Carte live', icon: MapPin },
   { to: '/map', label: 'Carte live', icon: MapPin },
   { to: '/agents', label: 'Agents', icon: Users },
   { to: '/clients', label: 'Clients', icon: Building2 },
