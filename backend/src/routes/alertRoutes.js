@@ -6,6 +6,7 @@ const { authenticate, authorize } = require('../middleware/auth');
 router.use(authenticate);
 
 router.get('/', controller.list);
+router.put('/resolve-all', authorize('supervisor', 'admin'), controller.resolveAll);
 router.put('/:id/read', controller.markRead);
 router.put('/:id/resolve', authorize('supervisor', 'admin'), controller.resolve);
 

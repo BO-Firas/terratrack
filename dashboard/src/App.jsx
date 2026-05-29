@@ -12,6 +12,8 @@ import AgentDetailPage from './pages/AgentDetailPage';
 import UsersPage from './pages/UsersPage';
 import DailyReportPage from './pages/DailyReportPage';
 import OverviewPage from './pages/OverviewPage';
+import ClientHistoryPage from './pages/ClientHistoryPage';
+import PeriodReportPage from './pages/PeriodReportPage';
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -48,6 +50,8 @@ export default function App() {
         <Route path="agents/:id" element={<AgentDetailPage />} />
         <Route path="users" element={<UsersPage />} />
         <Route path="agents/:id/report" element={<DailyReportPage />} />
+        <Route path="clients/:id" element={<ClientHistoryPage />} />
+        <Route path="agents/:id/report-period" element={<PeriodReportPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

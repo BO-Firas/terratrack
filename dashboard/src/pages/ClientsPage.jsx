@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { clientsAPI, zonesAPI } from '../services/api';
 import PageHeader from '../components/PageHeader';
 import { Plus, Pencil, Trash2, X, MapPin, Building2 } from 'lucide-react';
@@ -44,6 +45,7 @@ export default function ClientsPage() {
   const [form, setForm] = useState(emptyForm);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
+  const navigate = useNavigate();
 
   function load() {
     setLoading(true);
@@ -135,8 +137,13 @@ export default function ClientsPage() {
                 {clients.map((client, i) => {
                   const t = typeLabels[client.type] || typeLabels.other;
                   return (
-                    <tr key={client._id} className="text-sm hover:bg-[var(--bg-hover)] transition"
-                      style={{ borderBottom: i < clients.length - 1 ? '1px solid var(--border-subtle)' : 'none' }}>
+                    <tr key={client._id}
+                      onClick={(e) => {
+                        if (e.target.closest('button')) return;
+                        navigate(`/clients/${client._id}`);
+                      }}
+                      className="text-sm hover:bg-[var(--bg-hover)] transition"
+                      style={{ cursor: 'pointer', borderBottom: i < clients.length - 1 ? '1px solid var(--border-subtle)' : 'none' }}>
                       <td className="px-4 py-3 font-medium text-[var(--text-primary)]">{client.name}</td>
                       <td className="px-4 py-3">
                         <span className="text-[10px] px-2 py-1 rounded-md font-medium uppercase tracking-wider"

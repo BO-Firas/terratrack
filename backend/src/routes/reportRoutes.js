@@ -5,7 +5,7 @@ const { authenticate } = require('../middleware/auth');
 
 router.use(authenticate);
 
-// Rapport journalier : agent voit le sien, superviseur/admin voient n'importe lequel
 router.get('/daily', controller.dailyReport);
+router.get('/period', controller.periodReport);
 
 module.exports = router;

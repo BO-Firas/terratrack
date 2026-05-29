@@ -6,7 +6,7 @@ exports.list = async (req, res, next) => {
     const { agent, unread, severity, type } = req.query;
     const filter = {};
 
-    // Un agent ne voit que ses propres alertes
+    // An agent sees only their own alerts
     if (req.user.role === 'agent') {
       filter.agent = req.user._id;
     } else if (agent) {
@@ -20,7 +20,7 @@ exports.list = async (req, res, next) => {
     const alerts = await Alert.find(filter)
       .populate('agent', 'fullName')
       .sort({ createdAt: -1 })
-      .limit(200);
+      .limit(500);
 
     res.json({ alerts });
   } catch (error) {
@@ -36,14 +36,14 @@ exports.markRead = async (req, res, next) => {
       { isRead: true },
       { new: true }
     );
-    if (!alert) return res.status(404).json({ message: 'Alerte introuvable' });
+    if (!alert) return res.status(404).json({ message: 'Alert not found' });
     res.json({ alert });
   } catch (error) {
     next(error);
   }
 };
 
-// PUT /api/alerts/:id/resolve
+// PUT /api/alerts/:id/resolve - mark single alert as resolved
 exports.resolve = async (req, res, next) => {
   try {
     const alert = await Alert.findByIdAndUpdate(
@@ -55,8 +55,29 @@ exports.resolve = async (req, res, next) => {
       },
       { new: true }
     );
-    if (!alert) return res.status(404).json({ message: 'Alerte introuvable' });
+    if (!alert) return res.status(404).json({ message: 'Alert not found' });
     res.json({ alert });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// PUT /api/alerts/resolve-all - mark every unresolved alert as resolved
+// (supervisor / admin only - protected at route level)
+exports.resolveAll = async (req, res, next) => {
+  try {
+    const result = await Alert.updateMany(
+      { isResolved: false },
+      {
+        isResolved: true,
+        resolvedBy: req.user._id,
+        resolvedAt: new Date(),
+      }
+    );
+    res.json({
+      message: 'All alerts marked as resolved',
+      count: result.modifiedCount,
+    });
   } catch (error) {
     next(error);
   }

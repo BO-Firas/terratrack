@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { alertsAPI } from '../services/api';
 import { getSocket } from '../services/socket';
 import PageHeader from '../components/PageHeader';
-import { AlertTriangle, CheckCircle, Info, AlertOctagon } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Info, AlertOctagon, Calendar } from 'lucide-react';
 
 const severityConfig = {
   info: { color: '#3b82f6', icon: Info },
@@ -56,10 +56,7 @@ export default function AlertsPage() {
 
   return (
     <div className="h-full overflow-y-auto">
-      <PageHeader
-        title="Alertes"
-        subtitle={`${unresolvedCount} alerte${unresolvedCount > 1 ? 's' : ''} non resolue${unresolvedCount > 1 ? 's' : ''}`}
-      >
+      <PageHeader title="Alertes" subtitle={`${unresolvedCount} alerte${unresolvedCount > 1 ? 's' : ''} non resolue${unresolvedCount > 1 ? 's' : ''}`}>
         <label className="flex items-center gap-2 text-xs text-[var(--text-secondary)] cursor-pointer">
           <input
             type="checkbox"
@@ -69,6 +66,29 @@ export default function AlertsPage() {
           />
           Afficher les resolues
         </label>
+        {unresolvedCount > 0 && (
+          <button
+            onClick={async () => {
+              if (!window.confirm(`Marquer toutes les ${unresolvedCount} alertes comme resolues ?`)) return;
+              try {
+              await alertsAPI.resolveAll();
+              // Reload list
+              const r = await alertsAPI.list();
+              setAlerts(r.data.alerts);
+              } catch (err) {
+              alert(err.response?.data?.message || 'Erreur');
+              }
+            }}
+            className="px-3 py-2 rounded-lg text-xs font-medium ml-3"
+            style={{
+              backgroundColor: 'var(--bg-base)',
+              color: 'var(--color-danger)',
+              border: '1px solid var(--border-subtle)',
+            }}
+          >
+            Tout resoudre
+          </button>
+        )}
       </PageHeader>
 
       <div className="p-7">

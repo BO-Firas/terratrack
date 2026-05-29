@@ -75,6 +75,7 @@ export const alertsAPI = {
   list: (params) => api.get('/alerts', { params }),
   markRead: (id) => api.put(`/alerts/${id}/read`),
   resolve: (id) => api.put(`/alerts/${id}/resolve`),
+  resolveAll: () => api.put('/alerts/resolve-all'),
 };
 
 export const statsAPI = {
@@ -95,4 +96,5 @@ export const usersAPI = {
 
 export const reportsAPI = {
   daily: (agentId, date) => api.get('/reports/daily', { params: { agent: agentId, date } }),
+  period: (agentId, start, end) => api.get('/reports/period', { params: { agent: agentId, start, end } }),
 };

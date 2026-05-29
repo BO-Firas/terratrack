@@ -82,6 +82,20 @@ export default function AgentDetailPage() {
             </div>
           )}
           <button
+            onClick={() => navigate(`/agents/${id}/report-period`)}
+            className="flex items-center gap-2 whitespace-nowrap px-4 py-2.5 rounded-lg text-sm font-medium transition"
+            style={{
+              backgroundColor: 'var(--bg-base)',
+              color: 'var(--text-primary)',
+              border: '1px solid var(--border-default)',
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-hover)')}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-base)')}
+          >
+            <Calendar size={16} />
+            Rapport periode
+          </button>
+          <button
             onClick={() => navigate(`/agents/${id}/report`)}
             className="tt-button-primary flex items-center gap-2 whitespace-nowrap"
           >
@@ -192,7 +206,6 @@ function StatCard({ icon: Icon, color, value, label, highlight }) {
   );
 }
 
-// Histogramme en SVG pur (aucune dependance)
 function BarChart({ data, color, suffix = '' }) {
   const max = Math.max(...data.map((d) => d.value), 1);
   const W = 100, H = 60, gap = 3;
