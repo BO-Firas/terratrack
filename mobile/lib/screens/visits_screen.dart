@@ -103,71 +103,231 @@ class _VisitCard extends StatelessWidget {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final timeFormat = DateFormat('HH:mm');
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.bgElevated,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.borderSubtle),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+  Future<void> _openNoteDialog(BuildContext context) async {
+    final controller = TextEditingController(text: visit.notes ?? '');
+    final result = await showDialog<String>(
+      context: context,
+      builder: (ctx) => Dialog(
+        backgroundColor: AppColors.bgElevated,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: Text(
-                  visit.clientName ?? 'Client',
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
+              Row(
+                children: [
+                  const Icon(Icons.edit_note, color: AppColors.accent, size: 22),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      visit.notes == null || visit.notes!.isEmpty
+                          ? 'Ajouter une note'
+                          : 'Modifier la note',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: _statusColor.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(color: _statusColor.withOpacity(0.3)),
-                ),
-                child: Text(
-                  _statusLabel,
-                  style: TextStyle(
-                    color: _statusColor,
-                    fontSize: 9,
-                    letterSpacing: 1.5,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              const Icon(Icons.access_time,
-                  size: 13, color: AppColors.textTertiary),
-              const SizedBox(width: 6),
+              const SizedBox(height: 6),
               Text(
-                'Entree : ${timeFormat.format(visit.enteredAt.toLocal())}',
+                visit.clientName ?? 'Client',
                 style: const TextStyle(
                   fontSize: 12,
                   color: AppColors.textSecondary,
-                  fontFamily: 'monospace',
                 ),
               ),
-              if (visit.leftAt != null) ...[
-                const SizedBox(width: 12),
+              const SizedBox(height: 14),
+              TextField(
+                controller: controller,
+                autofocus: true,
+                maxLines: 5,
+                maxLength: 500,
+                style: const TextStyle(
+                    color: AppColors.textPrimary, fontSize: 14),
+                decoration: InputDecoration(
+                  hintText: 'Ex: client absent, commande passee, a rappeler...',
+                  hintStyle: const TextStyle(
+                      color: AppColors.textTertiary, fontSize: 13),
+                  filled: true,
+                  fillColor: AppColors.bgBase,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: AppColors.borderDefault),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: AppColors.borderDefault),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide:
+                        const BorderSide(color: AppColors.accent, width: 1.5),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextButton(
+                      onPressed: () => Navigator.of(ctx).pop(null),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        backgroundColor: AppColors.bgBase,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: const Text(
+                        'Annuler',
+                        style: TextStyle(color: AppColors.textSecondary),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () =>
+                          Navigator.of(ctx).pop(controller.text.trim()),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.accent,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: const Text(
+                        'Enregistrer',
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    if (result == null) return; // cancelled
+
+    final appState = context.read<AppState>();
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      await appState.apiService.addVisitNotes(visit.id, result);
+      await appState.loadTodayVisits();
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text('Note enregistree'),
+          backgroundColor: AppColors.success,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    } catch (_) {
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text('Erreur lors de l\'enregistrement'),
+          backgroundColor: AppColors.danger,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final timeFormat = DateFormat('HH:mm');
+    final hasNote = visit.notes != null && visit.notes!.trim().isNotEmpty;
+
+    return GestureDetector(
+      onTap: () => _openNoteDialog(context),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.bgElevated,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.borderSubtle),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    visit.clientName ?? 'Client',
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: _statusColor.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(color: _statusColor.withOpacity(0.3)),
+                  ),
+                  child: Text(
+                    _statusLabel,
+                    style: TextStyle(
+                      color: _statusColor,
+                      fontSize: 9,
+                      letterSpacing: 1.5,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                const Icon(Icons.access_time,
+                    size: 13, color: AppColors.textTertiary),
+                const SizedBox(width: 6),
                 Text(
-                  'Sortie : ${timeFormat.format(visit.leftAt!.toLocal())}',
+                  'Entree : ${timeFormat.format(visit.enteredAt.toLocal())}',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: AppColors.textSecondary,
+                    fontFamily: 'monospace',
+                  ),
+                ),
+                if (visit.leftAt != null) ...[
+                  const SizedBox(width: 12),
+                  Text(
+                    'Sortie : ${timeFormat.format(visit.leftAt!.toLocal())}',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textSecondary,
+                      fontFamily: 'monospace',
+                    ),
+                  ),
+                ],
+              ],
+            ),
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                const Icon(Icons.timer_outlined,
+                    size: 13, color: AppColors.textTertiary),
+                const SizedBox(width: 6),
+                Text(
+                  'Duree : ${visit.formattedDuration}',
                   style: const TextStyle(
                     fontSize: 12,
                     color: AppColors.textSecondary,
@@ -175,25 +335,55 @@ class _VisitCard extends StatelessWidget {
                   ),
                 ),
               ],
-            ],
-          ),
-          const SizedBox(height: 4),
-          Row(
-            children: [
-              const Icon(Icons.timer_outlined,
-                  size: 13, color: AppColors.textTertiary),
-              const SizedBox(width: 6),
-              Text(
-                'Duree : ${visit.formattedDuration}',
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: AppColors.textSecondary,
-                  fontFamily: 'monospace',
+            ),
+            // Note display (or "Add note" prompt)
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: hasNote
+                    ? AppColors.accent.withOpacity(0.08)
+                    : AppColors.bgBase,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: hasNote
+                      ? AppColors.accent.withOpacity(0.25)
+                      : AppColors.borderSubtle,
                 ),
               ),
-            ],
-          ),
-        ],
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    hasNote ? Icons.sticky_note_2 : Icons.add_comment_outlined,
+                    size: 15,
+                    color:
+                        hasNote ? AppColors.accent : AppColors.textTertiary,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      hasNote ? visit.notes! : 'Ajouter une note...',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: hasNote
+                            ? AppColors.textPrimary
+                            : AppColors.textTertiary,
+                        fontStyle:
+                            hasNote ? FontStyle.normal : FontStyle.italic,
+                      ),
+                    ),
+                  ),
+                  Icon(
+                    Icons.edit,
+                    size: 13,
+                    color: AppColors.textTertiary,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
